@@ -1,5 +1,7 @@
 import { Client } from 'discord.js';
 import { config } from 'dotenv';
+import { MessageHandler } from './handlers/MessageHandler';
+import { Command } from './interfaces/Command';
 config();
 
 const PREFIX = process.env.PREFIX ?? '';
@@ -16,11 +18,13 @@ client.on('message', async msg => {
   if (args[0].trim() === '') {
     args.shift();
   }
-  const command = args.shift()?.toLowerCase();
+  const command: Command = args.shift()?.toLowerCase() as Command;
 
-  switch(command) {
+const Message = new MessageHandler(msg, command);
+
+switch(command) {
     case 'ping':
-      await msg.reply('pong');
+      await Message.ping();
       break;
     case 'react':
       await msg.react('👌');
