@@ -9,6 +9,7 @@ import { isMatt } from './utils/Validators';
 config();
 
 // Matt's Discord ID: 350753691940290581
+const channel = process.env.ENV === 'development' ? 'bot-testing' : 'general';
 const PREFIX = process.env.PREFIX ?? '';
 const client = new Client({ intents: ['GUILDS', 'GUILD_MEMBERS', 'GUILD_MESSAGES'] });
 let MessageHandler: MsgHandler;
@@ -20,7 +21,7 @@ client.on('ready', async () => {
   MessageHandler = new MsgHandler(client);
   Users = new UsersComponent(MessageHandler);
   console.log(`Logged in as user ${client.user?.tag}`);
-  MessageHandler.sendMessage(client.channels.cache.find((c: any) => c.name === 'general') as TextChannel, 'I have finally arrived, pray dost not mind me.');
+  MessageHandler.sendMessage(client.channels.cache.find((c: any) => c.name === channel) as TextChannel, 'I have finally arrived, pray dost not mind me.');
 });
 
 client.on('message', async msg => {
