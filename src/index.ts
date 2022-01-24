@@ -1,4 +1,3 @@
-import { AsyncLocalStorage } from 'async_hooks';
 import { Client, TextChannel } from 'discord.js';
 import { config } from 'dotenv';
 import { Users as UsersComponent } from './components/users';
@@ -55,7 +54,7 @@ client.on('message', async msg => {
         if (type === 'get') {
           Users.getUserName(msg.author.id);
         } else if (type === 'set') {
-          Users.setUserName(msg.author.id, value);
+          Users.setUserName(msg.author.id, value, msg.author.username);
         }
         break;
       default: 

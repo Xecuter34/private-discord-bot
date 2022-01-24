@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model discords {
+  id            Int             @id @default(autoincrement())
+  discord_id    String          @unique @db.VarChar
+  username      String          @db.VarChar
+  created_at    DateTime        @db.Timestamp(6)
+  updated_at    DateTime        @db.Timestamp(6)
+  user_discords user_discords[]
+}
+
+model permission_types {
+  id          Int           @id @default(autoincrement())
+  name        String        @db.VarChar
+  permissions permissions[]
+}
+
+model permissions {
+  id               String             @id @db.Uuid
+  name             String             @db.VarChar
+  type             Int
+  permission_types permission_types   @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_permissions user_permissions[]
+}
+
+model user_details {
+  id      Int    @id @default(autoincrement())
+  user_id String @db.Uuid
+  users   users  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_discords {
+  id         Int      @id(map: "discord_users_pkey") @default(autoincrement())
+  user_id    String   @db.Uuid
+  discord_id String   @db.VarChar
+  discords   discords @relation(fields: [discord_id], references: [discord_id], onDelete: NoAction, onUpdate: NoAction)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_permissions {
+  id            Int         @id @default(autoincrement())
+  user_id       String      @db.Uuid
+  permission_id String      @db.Uuid
+  permissions   permissions @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users         users       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  id               String             @id @db.Uuid
+  username         String?            @db.VarChar
+  created_at       DateTime?          @db.Timestamp(6)
+  updated_at       DateTime?          @db.Timestamp(6)
+  user_details     user_details[]
+  user_discords    user_discords[]
+  user_permissions user_permissions[]
+}
