@@ -1,0 +1,1 @@
+export const RainbowSix = ['siege', 'r6', 'rsix', 'rainbowsix'];

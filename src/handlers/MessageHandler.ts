@@ -1,4 +1,4 @@
-import { Client, Message, Channel, TextChannel } from "discord.js";
+import { Client, Message, TextChannel, MessageEmbed } from "discord.js";
 import { ping as componentPing } from '../components/ping';
 import { Command } from '../interfaces/Command';
 
@@ -32,5 +32,11 @@ export class MessageHandler {
   reply = async (message: string): Promise<void> => {
     if (message.trim() === '') return;
     await this._message?.reply(message);
+  }
+
+  sendEmbedMessage = async (channel: TextChannel, embed: MessageEmbed): Promise<void> => {
+    await channel.send({
+      embeds: [embed]
+    });
   }
 }
