@@ -18,7 +18,7 @@ export class Users {
 
     const user = await getUserByDiscordId(id);
     if (user === null) {
-      this._messgeHandler.reply('For some reason I cannot find thou user, please report this as a bug.');
+      this._messgeHandler.reply('For some reason I cannot find thy user, please report this as a bug.');
       return;
     }
 
