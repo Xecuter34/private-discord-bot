@@ -161,12 +161,26 @@ node-fetch@^2.6.1:
   dependencies:
     whatwg-url "^5.0.0"
 
+node-fetch@^2.6.2:
+  version "2.6.7"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
+  integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
+  dependencies:
+    whatwg-url "^5.0.0"
+
 prisma@^3.8.1:
   version "3.8.1"
   resolved "https://registry.yarnpkg.com/prisma/-/prisma-3.8.1.tgz#44395cef7cbb1ea86216cb84ee02f856c08a7873"
   integrity sha512-Q8zHwS9m70TaD7qI8u+8hTAmiTpK+IpvRYF3Rgb/OeWGQJOMgZCFFvNCiSfoLEQ95wilK7ctW3KOpc9AuYnRUA==
   dependencies:
     "@prisma/engines" "3.8.0-43.34df67547cf5598f5a6cd3eb45f14ee70c3fb86f"
+
+r6api.js@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/r6api.js/-/r6api.js-4.0.0.tgz#7b266cdbbb55f128e63d259eda7d200bcbc084c7"
+  integrity sha512-AzsXAU23GNLCSSKfx/vJxz8UFfISP0xmvqstFEnWnO4NN80RM4Lf1aVMUG0xJ7E1iWrOYgM4axyAIFyCtDG7FA==
+  dependencies:
+    node-fetch "^2.6.2"
 
 tr46@~0.0.3:
   version "0.0.3"

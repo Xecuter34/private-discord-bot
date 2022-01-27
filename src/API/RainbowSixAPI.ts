@@ -1,6 +1,12 @@
 import get from 'axios';
 import { Platforms } from "../interfaces/Platforms";
 import { PlayerSearch } from "../interfaces/RainbowSix/PlayerSearch";
+import R6API from 'r6api.js'
+
+// Eventually switch to this as I can get live stats myself...
+// const email = process.env.UBI_EMAIL;
+// const password = process.env.UBI_PASSWORD;
+// const r6api = new R6API({email, password});
 
 export class RainbowSixAPI {
   /**

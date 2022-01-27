@@ -38,7 +38,10 @@ export class StatsHandler {
             { name: 'Username', value: stats.username },
             { name: 'Level', value: stats.progressionStats.level.toString() },
             ...seasonal
-          ]);
+          ])
+          .setFooter({
+            text: 'Stats provided by R6Stats'
+          });
       default: 
         return null;
     }
