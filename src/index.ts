@@ -1,4 +1,4 @@
-import { Client, TextChannel, MessageEmbed } from 'discord.js';
+import { Client, TextChannel } from 'discord.js';
 import { config } from 'dotenv';
 import { Users as UsersComponent } from './components/users';
 import { MessageHandler as MsgHandler } from './handlers/MessageHandler';
@@ -73,25 +73,12 @@ client.on('message', async msg => {
           username = msg.author.username;
         }
 
-        const stats = await StatHandler.getPlayerStats(game, platform, username);
-        if (stats === null) {
+        const embedMessage = await StatHandler.getPlayerStats(game, platform, username);
+        if (embedMessage === null) {
           await msg.reply('I am sorry, I\'m not able to find stats for thou adventurer thou refers to.');
           break;
         }
 
-        const embedMessage = new MessageEmbed()
-          .setColor('#4DB6AC')
-          .setTitle(`${username}'s Stats`)
-          .setURL(`https://r6stats.com/stats/${stats.ubisoft_id}/`)
-          .setThumbnail(stats.avatar_url_256)
-          .addFields([
-            { name: 'Username', value: stats.username },
-            { name: 'Level', value: stats.progressionStats.level.toString() },
-            { name: 'Kills (Seasonal)', value: stats.seasonalStats.kills.toString(), inline: true },
-            { name: 'Deaths (Seasonal)', value: stats.seasonalStats.deaths.toString(), inline: true },
-            { name: 'K/D (Seasonal)', value: String((stats.seasonalStats.kills / stats.seasonalStats.deaths).toFixed(2)), inline: true },
-            { name: 'MMR', value: stats.seasonalStats.mmr.toString() }
-          ]);
         MessageHandler.sendEmbedMessage(client.channels.cache.find((c: any) => c.name === channel) as TextChannel, embedMessage);
         break;
       default: 
