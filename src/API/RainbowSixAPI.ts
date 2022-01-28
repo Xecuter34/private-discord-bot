@@ -1,7 +1,6 @@
 import { PlatformAll, Platform } from "../interfaces/Platforms";
 import R6API from 'r6api.js'
 
-// Eventually switch to this as I can get live stats myself...
 const email = process.env.UBI_EMAIL;
 const password = process.env.UBI_PASSWORD;
 const r6api = new R6API({email, password});
