@@ -61,8 +61,8 @@ client.on('message', async msg => {
       case 'stats':
         const game = args.shift()?.toLowerCase();
         const platform = args.shift()?.toLowerCase() as PlatformAll;
-        let username = args.shift();
-        if (!game || !platform && isValidPlatform(platform)) {
+        let username = args.join(' ');
+        if (!game || !platform || !isValidPlatform(platform)) {
           await msg.reply('I am sorry, I\'m not sure what thou is trying to refer to.');
           break;
         }
