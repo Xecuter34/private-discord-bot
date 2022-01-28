@@ -8,12 +8,12 @@ datasource db {
 }
 
 model discords {
-  id            Int             @id @default(autoincrement())
-  discord_id    String          @unique @db.VarChar
-  username      String          @db.VarChar
-  created_at    DateTime        @db.Timestamp(6)
-  updated_at    DateTime        @db.Timestamp(6)
-  user_discords user_discords[]
+  id            Int            @id @default(autoincrement())
+  discord_id    String         @unique @db.VarChar
+  username      String         @db.VarChar
+  created_at    DateTime       @db.Timestamp(6)
+  updated_at    DateTime       @db.Timestamp(6)
+  user_discords user_discords?
 }
 
 model permission_types {
@@ -39,7 +39,7 @@ model user_details {
 model user_discords {
   id         Int      @id(map: "discord_users_pkey") @default(autoincrement())
   user_id    String   @db.Uuid
-  discord_id String   @db.VarChar
+  discord_id String   @unique @db.VarChar
   discords   discords @relation(fields: [discord_id], references: [discord_id], onDelete: NoAction, onUpdate: NoAction)
   users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

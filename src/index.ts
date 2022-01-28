@@ -4,10 +4,8 @@ import { Users as UsersComponent } from './components/users';
 import { MessageHandler as MsgHandler } from './handlers/MessageHandler';
 import { StatsHandler } from './handlers/StatsHandler';
 import { Command } from './interfaces/Command';
-import { User } from './interfaces/User';
 import { isMatt, isValidPlatform } from './utils/Validators';
-import { RainbowSix } from './utils/GameRefs';
-import { Platforms } from './interfaces/Platforms';
+import { PlatformAll } from './interfaces/Platforms';
 config();
 
 // Matt's Discord ID: 350753691940290581
@@ -62,7 +60,7 @@ client.on('message', async msg => {
         break;
       case 'stats':
         const game = args.shift()?.toLowerCase();
-        const platform = args.shift()?.toLowerCase() as Platforms;
+        const platform = args.shift()?.toLowerCase() as PlatformAll;
         let username = args.shift();
         if (!game || !platform && isValidPlatform(platform)) {
           await msg.reply('I am sorry, I\'m not sure what thou is trying to refer to.');
