@@ -6,6 +6,8 @@ import { StatsHandler } from './handlers/StatsHandler';
 import { Command } from './interfaces/Command';
 import { isMatt, isValidPlatform } from './utils/Validators';
 import { PlatformAll } from './interfaces/Platforms';
+import { BuildCommandHelpMessage, BuildHelpMessage } from './components/help';
+import { StatsController } from './providers/StatController';
 config();
 
 // Matt's Discord ID: 350753691940290581
@@ -16,6 +18,7 @@ let MessageHandler: MsgHandler;
 let Users: UsersComponent;
 
 const StatHandler = new StatsHandler();
+new StatsController(30000);
 
 client.on('ready', async () => {
   MessageHandler = new MsgHandler(client);
@@ -78,6 +81,18 @@ client.on('message', async msg => {
         }
 
         MessageHandler.sendEmbedMessage(client.channels.cache.find((c: any) => c.name === channel) as TextChannel, embedMessage);
+        break;
+      case 'help':
+        const commandName = args.shift()?.toLowerCase();
+        if (!commandName) {
+          await MessageHandler.sendEmbedMessage(client.channels.cache.find((c: any) => c.name === channel) as TextChannel, BuildHelpMessage());
+          break;
+        }
+
+        await MessageHandler.sendEmbedMessage(
+          client.channels.cache.find((c: any) => c.name === channel) as TextChannel, 
+          BuildCommandHelpMessage(commandName as Command)
+        );
         break;
       default: 
         await msg.reply('I am sorry, I\'m not sure what thou means to communitcate.');

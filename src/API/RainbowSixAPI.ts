@@ -32,30 +32,36 @@ export class RainbowSixAPI {
   }
 
   getPlayerStats = async (id: string, platform: PlatformAll) => {
-    const userData: Array<R6UserData> = await r6api.findByUsername(platform, id);
-    if (userData.length === 0) return null;
+    try {
+      console.log(`Attempting to fetch player stats for ${id}`);
+      const userData: Array<R6UserData> = await r6api.findByUsername(platform, id);
+      if (userData.length === 0) return null;
 
-    const userPlatform = userData[0].platform as Omit<PlatformAll, 'steam' | 'epic' | 'amazon'> as Platform
-    const progressionData = await r6api.getProgression(userPlatform, userData[0].id);
+      const userPlatform = userData[0].platform as Omit<PlatformAll, 'steam' | 'epic' | 'amazon'> as Platform
+      const progressionData = await r6api.getProgression(userPlatform, userData[0].id);
 
-    const seasonalData = await r6api.getRanks(userPlatform, userData[0].id);
-    const latestSeasonalData = seasonalData[0].seasons[this._siegeLiveSeason].regions.emea.boards.pvp_ranked;
-    const playerSeasonData = latestSeasonalData.lastMatch.result !== 'unknown' 
-      ? {
-        kills: latestSeasonalData.kills,
-        deaths: latestSeasonalData.deaths,
-        kd: latestSeasonalData.kd,
-        mmr: latestSeasonalData.current.mmr
+      const seasonalData = await r6api.getRanks(userPlatform, userData[0].id);
+      const latestSeasonalData = seasonalData[0].seasons[this._siegeLiveSeason].regions.emea.boards.pvp_ranked;
+      const playerSeasonData = latestSeasonalData.lastMatch.result !== 'unknown' 
+        ? {
+          kills: latestSeasonalData.kills,
+          deaths: latestSeasonalData.deaths,
+          kd: latestSeasonalData.kd,
+          mmr: latestSeasonalData.current.mmr
+        }
+        : null;
+      console.log(`Completed fetching player stats for ${id}`);
+      return {
+        username: userData[0].username,
+        ubisoft_id: userData[0].id,
+        avatar: userData[0].avatar[256],
+        progression: {
+          level: progressionData[0].level
+        },
+        seasonal: playerSeasonData
       }
-      : null;
-    return {
-      username: userData[0].username,
-      ubisoft_id: userData[0].id,
-      avatar: userData[0].avatar[256],
-      progression: {
-        level: progressionData[0].level
-      },
-      seasonal: playerSeasonData
+    } catch (err: any) {
+      console.error(`Failed to fetch player stats: ${err.message}`);
     }
   }
 }

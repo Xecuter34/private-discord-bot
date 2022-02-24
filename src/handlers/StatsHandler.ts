@@ -10,7 +10,7 @@ export class StatsHandler {
     switch (true) {
       case (RainbowSix.includes(game)):
         const stats = (await this._rainbowSixAPI.getPlayerStats(id, platform));
-        if (stats === null) {
+        if (!stats || stats === null) {
           return null;
         }
 

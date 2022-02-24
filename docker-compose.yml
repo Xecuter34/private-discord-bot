@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  traveller-bot:
+    build:
+      context: .
+      dockerfile: travellerBot.DockerFile
+    command: yarn start-dev
+    env_file: .envs/docker.env
