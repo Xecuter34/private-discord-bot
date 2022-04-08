@@ -43,12 +43,7 @@ export class RainbowSixAPI {
       const seasonalData = await r6api.getRanks(userPlatform, userData[0].id);
       const latestSeasonalData = seasonalData[0].seasons[this._siegeLiveSeason].regions.emea.boards.pvp_ranked;
       const playerSeasonData = latestSeasonalData.lastMatch.result !== 'unknown' 
-        ? {
-          kills: latestSeasonalData.kills,
-          deaths: latestSeasonalData.deaths,
-          kd: latestSeasonalData.kd,
-          mmr: latestSeasonalData.current.mmr
-        }
+        ? latestSeasonalData
         : null;
       console.log(`Completed fetching player stats for ${id}`);
       return {

@@ -23,7 +23,7 @@ export class StatsController {
     for (let i = 0; i < this._userHandlers.length; i++) {
       const user = this._userHandlers[i];
       await this.verifyHandler(user);
-      await this.saveRainbowSixStats(user.platform_name, user.platform as PlatformAll, user);
+      await this.saveRainbowSixStats(user.platform_username, user.platform as PlatformAll, user);
     };
 
     setTimeout(() => {
@@ -67,7 +67,8 @@ export class StatsController {
         if (key === null) {
           this._prismaClient.stat_metrics.create({
             data: {
-              name: ps
+              name: ps,
+              slug: ps
             }
           });
         }
@@ -84,7 +85,8 @@ export class StatsController {
         if (key === null) {
           this._prismaClient.stat_metrics.create({
             data: {
-              name: ps
+              name: ps,
+              slug: ps
             }
           });
         }
@@ -94,7 +96,8 @@ export class StatsController {
     Object.entries(playerStats.progression).forEach(async ([key, value]) => { this.insertStatMetric(key, value, handlerStats); });
 
     if (playerStats.seasonal !== null) {
-      Object.entries(playerStats.seasonal).forEach(async ([key, value]) => { this.insertStatMetric(key, value, handlerStats); });
+      // THIS IS NOT A FIX FOR VALUE!
+      Object.entries(playerStats.seasonal).forEach(async ([key, value]) => { this.insertStatMetric(key, parseInt(value.toString()), handlerStats); });
     }
   }
 

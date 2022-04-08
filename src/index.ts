@@ -18,7 +18,7 @@ let MessageHandler: MsgHandler;
 let Users: UsersComponent;
 
 const StatHandler = new StatsHandler();
-new StatsController(30000);
+// new StatsController(30000);
 
 client.on('ready', async () => {
   MessageHandler = new MsgHandler(client);
@@ -65,7 +65,12 @@ client.on('message', async msg => {
         const game = args.shift()?.toLowerCase();
         const platform = args.shift()?.toLowerCase() as PlatformAll;
         let username = args.join(' ');
-        if (!game || !platform || !isValidPlatform(platform)) {
+        if (!game || !platform) {
+          await msg.reply('I am sorry, I\'m not sure what thou is trying to refer to.');
+          break;
+        }
+
+        if (game == 'siege' && !isValidPlatform(platform)) {
           await msg.reply('I am sorry, I\'m not sure what thou is trying to refer to.');
           break;
         }
@@ -74,7 +79,7 @@ client.on('message', async msg => {
           username = msg.author.username;
         }
 
-        const embedMessage = await StatHandler.getPlayerStats(game, platform, username);
+        const embedMessage = await StatHandler.getPlayerStats(game, platform, username, msg.author.id);
         if (embedMessage === null) {
           await msg.reply('I am sorry, I\'m not able to find stats for thou adventurer thou refers to.');
           break;

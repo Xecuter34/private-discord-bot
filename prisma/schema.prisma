@@ -63,13 +63,13 @@ model users {
 }
 
 model user_handlers {
-  id            Int             @id @default(autoincrement())
-  platform_id   String          @db.VarChar
-  platform_name String          @db.VarChar
-  platform      String          @db.VarChar
-  platform_game String          @db.VarChar
-  user_id       String          @db.Uuid
-  handler_stats handler_stats[]
+  id                Int             @id @default(autoincrement())
+  platform_user_id  String          @db.VarChar
+  platform_username String          @db.VarChar
+  platform          String          @db.VarChar
+  platform_game     String          @db.VarChar
+  user_id           String          @db.Uuid
+  handler_stats     handler_stats[]
 }
 
 model handler_stat_values {
@@ -95,4 +95,5 @@ model stat_metrics {
   id       Int     @id @default(autoincrement())
   name     String  @db.VarChar
   disabled Boolean @default(false)
+  slug     String  @db.VarChar
 }
