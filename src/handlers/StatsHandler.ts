@@ -162,13 +162,14 @@ export class StatsHandler {
           ]);
         }
       case (WorldOfWarcraft.includes(game)): {
-        const pvpSeason = await this._wowClientAPI.getCurrentSeasonalStats(username);
+        const realm = 'draenor';
+        const pvpCharacterData = await this._wowClientAPI.getCurrentSeasonalStats(username);
 
-        const seasonal = true ? [
-          { name: 'Kills (Seasonal)', value: "stats.seasonal.kills.toString()", inline: true },
-          { name: 'Deaths (Seasonal)', value: "stats.seasonal.deaths.toString()", inline: true },
-          { name: 'K/D (Seasonal)', value: "stats.seasonal.kd.toString()", inline: true },
-          { name: 'MMR', value: "stats.seasonal.current.mmr.toString()" }
+        const seasonal = pvpCharacterData ? [
+          { name: 'Rating (Seasonal)', value: pvpCharacterData.rating.toString(), inline: true },
+          { name: 'Bracket (Seasonal)', value: pvpCharacterData.bracket.type, inline: true },
+          { name: 'W/L (Seasonal)', value: ((pvpCharacterData.season_match_statistics.won / pvpCharacterData.season_match_statistics.played) * 100).toString(), inline: true },
+          { name: 'Faction', value: pvpCharacterData.faction.name }
         ] : [
           { name: "Season Not Started", value: 'No Matches have been played yet.' }
         ];
@@ -176,11 +177,11 @@ export class StatsHandler {
         return new MessageEmbed()
           .setColor('#4DB6AC')
           .setTitle(`${username}'s Stats`)
-          .setURL(`https://r6stats.com/stats//`)
-          .setThumbnail("URL for character")
+          .setURL(`https://worldofwarcraft.com/en-gb/character/eu/${realm}/${username}`)
+          .setThumbnail("https://render.worldofwarcraft.com/eu/character/draenor/129/121241217-avatar.jpg")
           .addFields([
             { name: 'Username', value: username },
-            { name: 'Level', value: "" },
+            { name: 'Level', value: "NOT_IMPLEMENTED" },
             ...seasonal
           ]);
         }

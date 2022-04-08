@@ -1,4 +1,6 @@
 import { wow } from 'blizzard.js';
+import { ICharacterPvPResponse } from '../interfaces/Warcraft/ICharacterPvPResponse';
+import { IPvPSeasonResponse } from '../interfaces/Warcraft/IPvPSeasonResponse';
 
 export class WarcraftAPI {
   private _warcraftCurrentSeason: number;
@@ -16,14 +18,18 @@ export class WarcraftAPI {
     });
   }
 
-  getCurrentSeasonalStats = async (username: string): Promise<any> => {
+  getCurrentSeasonalStats = async (username: string): Promise<ICharacterPvPResponse | undefined> => {
       if (!this._warcraftClient) {
         console.log('Warcraft client is not initialized');
         return;
       }
 
-      const pvpSeason = await this._warcraftClient.pvpSeason();
+      const pvpData = (await this._warcraftClient.characterPVP<ICharacterPvPResponse>({
+        realm: 'draenor',
+        name: username,
+        bracket: '2v2'
+      })).data
 
-      return pvpSeason;
+      return pvpData;
   }
 }
