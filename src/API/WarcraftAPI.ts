@@ -1,6 +1,8 @@
 import { wow } from 'blizzard.js';
-import { ICharacterPvPResponse } from '../interfaces/Warcraft/ICharacterPvPResponse';
-import { IPvPSeasonResponse } from '../interfaces/Warcraft/IPvPSeasonResponse';
+import { ICharacterProfileResponse } from '../interfaces/Warcraft/Responses/ICharacterProfileResponse';
+import { ICharacterPvPResponse } from '../interfaces/Warcraft/Responses/ICharacterPvPResponse';
+import { IRealmResponse } from '../interfaces/Warcraft/Responses/IRealmResponse';
+import { ICharacterMediaResponse } from '../interfaces/Warcraft/Responses/ICharacterMediaResponse';
 
 export class WarcraftAPI {
   private _warcraftCurrentSeason: number;
@@ -18,18 +20,56 @@ export class WarcraftAPI {
     });
   }
 
-  getCurrentSeasonalStats = async (username: string): Promise<ICharacterPvPResponse | undefined> => {
+  getCurrentSeasonalStats = async (username: string, realm: string, bracket: string): Promise<ICharacterPvPResponse | undefined> => {
       if (!this._warcraftClient) {
         console.log('Warcraft client is not initialized');
         return;
       }
 
       const pvpData = (await this._warcraftClient.characterPVP<ICharacterPvPResponse>({
-        realm: 'draenor',
+        realm: realm,
         name: username,
-        bracket: '2v2'
+        bracket: bracket
       })).data
 
       return pvpData;
+  }
+
+  getRealms = async (): Promise<IRealmResponse | undefined> => {
+    if (!this._warcraftClient) {
+      console.log('Warcraft client is not initialized');
+      return;
+    }
+
+    const realms = (await this._warcraftClient.realm<IRealmResponse>()).data
+    return realms;
+  }
+
+  getCharacterProfile = async (username: string, realmSlug: string): Promise<ICharacterProfileResponse | undefined> => {
+    if (!this._warcraftClient) {
+      console.log('Warcraft client is not initialized');
+      return;
+    }
+
+    const profile = (await this._warcraftClient.characterProfile<ICharacterProfileResponse>({
+      realm: realmSlug,
+      name: username
+    })).data;
+
+    return profile;
+  }
+
+  getCharacterMedia = async (username: string, realmSlug: string): Promise<ICharacterMediaResponse | undefined> => {
+    if (!this._warcraftClient) {
+      console.log('Warcraft client is not initialized');
+      return;
+    }
+
+    const media = (await this._warcraftClient.characterMedia<ICharacterMediaResponse>({
+      realm: realmSlug,
+      name: username
+    })).data;
+
+    return media;
   }
 }

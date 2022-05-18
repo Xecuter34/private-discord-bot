@@ -8,6 +8,7 @@ import { isMatt, isValidPlatform } from './utils/Validators';
 import { PlatformAll } from './interfaces/Platforms';
 import { BuildCommandHelpMessage, BuildHelpMessage } from './components/help';
 import { StatsController } from './providers/StatController';
+import { handleAdditionalParams } from './utils/Global';
 config();
 
 // Matt's Discord ID: 350753691940290581
@@ -64,7 +65,9 @@ client.on('message', async msg => {
       case 'stats':
         const game = args.shift()?.toLowerCase();
         const platform = args.shift()?.toLowerCase() as PlatformAll;
-        let username = args.join(' ');
+        const tArgs = args.join(' ');
+        let username = tArgs.split('/params')[0].trim();
+        const additionalParams = handleAdditionalParams(tArgs.split('/params')[1]?.trim());
         if (!game || !platform) {
           await msg.reply('I am sorry, I\'m not sure what thou is trying to refer to.');
           break;
@@ -79,7 +82,7 @@ client.on('message', async msg => {
           username = msg.author.username;
         }
 
-        const embedMessage = await StatHandler.getPlayerStats(game, platform, username, msg.author.id);
+        const embedMessage = await StatHandler.getPlayerStats(game, platform, username, msg.author.id, additionalParams);
         if (embedMessage === null) {
           await msg.reply('I am sorry, I\'m not able to find stats for thou adventurer thou refers to.');
           break;

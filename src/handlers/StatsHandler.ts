@@ -5,6 +5,9 @@ import { RainbowSix, WorldOfWarcraft } from "../utils/GameRefs";
 import { PrismaClient, user_handlers } from "@prisma/client";
 import { v4 } from "uuid";
 import { WarcraftAPI } from "../API/WarcraftAPI";
+import { ErrorCodes } from "../interfaces/ErrorCodes";
+import { FACTION_COLOR } from "../interfaces/Warcraft/Misc/Colors";
+import { WarcraftData } from "../interfaces/Warcraft/Misc/Data";
 
 export class StatsHandler {
   private readonly REFRESH_TIME = 14400;
@@ -89,7 +92,7 @@ export class StatsHandler {
     }
   }
 
-  getPlayerStats = async (game: string, platform: PlatformAll, username: string, discordId: string): Promise<MessageEmbed | null> => {
+  getPlayerStats = async (game: string, platform: PlatformAll, username: string, discordId: string, additionalParams?: Record<string, string>): Promise<MessageEmbed | null> => {
     switch (true) {
       case (RainbowSix.includes(game)): {
         const stats = (await this._rainbowSixAPI.getPlayerStats(username, platform));
@@ -162,26 +165,76 @@ export class StatsHandler {
           ]);
         }
       case (WorldOfWarcraft.includes(game)): {
-        const realm = 'draenor';
-        const pvpCharacterData = await this._wowClientAPI.getCurrentSeasonalStats(username);
+        if (!additionalParams) {
+          return null;
+        }
+        
+        const realm = additionalParams['realm'];
+        const bracket = additionalParams['bracket'];
+        const pvpCharacterData = await this._wowClientAPI.getCurrentSeasonalStats(username, realm, bracket);
+        const characterData = await this._wowClientAPI.getCharacterProfile(username, realm);
+        const characterMediaData = await this._wowClientAPI.getCharacterMedia(username, realm);
+        const winLosePercentage = pvpCharacterData ? ((pvpCharacterData.season_match_statistics.won / pvpCharacterData.season_match_statistics.played) * 100).toString() : '0';
 
-        const seasonal = pvpCharacterData ? [
+        const discordUser = await this._prismaClient.discords.findFirst({
+          where: {
+            discord_id: discordId
+          },
+          select: {
+            user_discords: {
+              select: {
+                user_id: true
+              }
+            }
+          }
+        })
+
+        let userHandler = await this._prismaClient.user_handlers.findFirst({
+          where: {
+            user_id: discordUser?.user_discords?.user_id
+          }
+        });
+
+        if (!userHandler) {
+          if (!discordUser || !discordUser.user_discords) {
+            return null;
+          }
+
+          userHandler = await this._prismaClient.user_handlers.create({
+            data: {
+              platform_user_id: characterData?.id.toString() ?? ErrorCodes.NOT_FOUND,
+              platform_username: characterData?.name ?? ErrorCodes.NOT_FOUND,
+              platform,
+              platform_game: game,
+              user_id: discordUser.user_discords.user_id,
+            }
+          });
+        }
+
+
+        this.saveToDatabase({
+          [`rating_${bracket}`]: pvpCharacterData?.rating ?? 0,
+          [`win_lose_${bracket}`]: parseInt(winLosePercentage) ?? 0,
+        }, userHandler);
+
+        const seasonal = pvpCharacterData && pvpCharacterData.season.id === WarcraftData.CURRENT_SEASON ? [
           { name: 'Rating (Seasonal)', value: pvpCharacterData.rating.toString(), inline: true },
           { name: 'Bracket (Seasonal)', value: pvpCharacterData.bracket.type, inline: true },
-          { name: 'W/L (Seasonal)', value: ((pvpCharacterData.season_match_statistics.won / pvpCharacterData.season_match_statistics.played) * 100).toString(), inline: true },
+          { name: 'W/L (Seasonal)', value: winLosePercentage, inline: true },
           { name: 'Faction', value: pvpCharacterData.faction.name }
         ] : [
           { name: "Season Not Started", value: 'No Matches have been played yet.' }
         ];
 
         return new MessageEmbed()
-          .setColor('#4DB6AC')
+          .setColor(characterData?.faction.type === 'HORDE' ? FACTION_COLOR.HORDE : FACTION_COLOR.ALLIANCE)
           .setTitle(`${username}'s Stats`)
           .setURL(`https://worldofwarcraft.com/en-gb/character/eu/${realm}/${username}`)
-          .setThumbnail("https://render.worldofwarcraft.com/eu/character/draenor/129/121241217-avatar.jpg")
+          .setThumbnail(characterMediaData?.assets.find(asset => asset.key === 'avatar')?.value ?? ErrorCodes.MEDIA_NOT_FOUND)
           .addFields([
             { name: 'Username', value: username },
-            { name: 'Level', value: "NOT_IMPLEMENTED" },
+            { name: 'Level', value: characterData?.level.toString() ?? ErrorCodes.NOT_FOUND, inline: true },
+            { name: 'Item Level', value: characterData?.average_item_level.toString() ?? ErrorCodes.NOT_FOUND },
             ...seasonal
           ]);
         }
