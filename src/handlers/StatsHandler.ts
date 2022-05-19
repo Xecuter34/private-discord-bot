@@ -7,7 +7,7 @@ import { v4 } from "uuid";
 import { WarcraftAPI } from "../API/WarcraftAPI";
 import { ErrorCodes } from "../interfaces/ErrorCodes";
 import { FACTION_COLOR } from "../interfaces/Warcraft/Misc/Colors";
-import { WarcraftData } from "../interfaces/Warcraft/Misc/Data";
+import { WarcraftData, WarcraftFallback } from "../interfaces/Warcraft/Misc/Data";
 
 export class StatsHandler {
   private readonly REFRESH_TIME = 14400;
@@ -46,7 +46,7 @@ export class StatsHandler {
           statMetric = await this._prismaClient.stat_metrics.create({
             data: {
               slug: key,
-              name: key.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+              name: key.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ').replace(/_/g, ' '),
               disabled: false
             }
           });
@@ -115,7 +115,8 @@ export class StatsHandler {
 
         let userHandler = await this._prismaClient.user_handlers.findFirst({
           where: {
-            user_id: discordUser?.user_discords?.user_id
+            user_id: discordUser?.user_discords?.user_id,
+            platform_user_id: stats.ubisoft_id
           }
         });
 
@@ -174,7 +175,7 @@ export class StatsHandler {
         const pvpCharacterData = await this._wowClientAPI.getCurrentSeasonalStats(username, realm, bracket);
         const characterData = await this._wowClientAPI.getCharacterProfile(username, realm);
         const characterMediaData = await this._wowClientAPI.getCharacterMedia(username, realm);
-        const winLosePercentage = pvpCharacterData ? ((pvpCharacterData.season_match_statistics.won / pvpCharacterData.season_match_statistics.played) * 100).toString() : '0';
+        const winLosePercentage = pvpCharacterData ? `${((pvpCharacterData.season_match_statistics.won / pvpCharacterData.season_match_statistics.played) * 100).toFixed(0)}%` : '0%';
 
         const discordUser = await this._prismaClient.discords.findFirst({
           where: {
@@ -191,7 +192,8 @@ export class StatsHandler {
 
         let userHandler = await this._prismaClient.user_handlers.findFirst({
           where: {
-            user_id: discordUser?.user_discords?.user_id
+            user_id: discordUser?.user_discords?.user_id,
+            platform_user_id: characterData?.id.toString() ?? ErrorCodes.NOT_FOUND
           }
         });
 
@@ -221,7 +223,12 @@ export class StatsHandler {
           { name: 'Rating (Seasonal)', value: pvpCharacterData.rating.toString(), inline: true },
           { name: 'Bracket (Seasonal)', value: pvpCharacterData.bracket.type, inline: true },
           { name: 'W/L (Seasonal)', value: winLosePercentage, inline: true },
-          { name: 'Faction', value: pvpCharacterData.faction.name }
+          { name: 'Wins (Seasonal)', value: pvpCharacterData.season_match_statistics.won.toString(), inline: true },
+          { name: 'Lost (Seasonal)', value: pvpCharacterData.season_match_statistics.lost.toString(), inline: true },
+          { name: 'Total (Seasonal)', value: pvpCharacterData.season_match_statistics.played.toString(), inline: true },
+          { name: 'Wins (Weekly)', value: pvpCharacterData.weekly_match_statistics.won.toString(), inline: true },
+          { name: 'Lost (Weekly)', value: pvpCharacterData.weekly_match_statistics.lost.toString(), inline: true },
+          { name: 'Total (Weekly)', value: pvpCharacterData.weekly_match_statistics.played.toString(), inline: true },
         ] : [
           { name: "Season Not Started", value: 'No Matches have been played yet.' }
         ];
@@ -230,13 +237,16 @@ export class StatsHandler {
           .setColor(characterData?.faction.type === 'HORDE' ? FACTION_COLOR.HORDE : FACTION_COLOR.ALLIANCE)
           .setTitle(`${username}'s Stats`)
           .setURL(`https://worldofwarcraft.com/en-gb/character/eu/${realm}/${username}`)
-          .setThumbnail(characterMediaData?.assets.find(asset => asset.key === 'avatar')?.value ?? ErrorCodes.MEDIA_NOT_FOUND)
+          .setThumbnail(characterMediaData?.assets.find(asset => asset.key === 'avatar')?.value ?? WarcraftFallback.URL)
           .addFields([
             { name: 'Username', value: username },
-            { name: 'Level', value: characterData?.level.toString() ?? ErrorCodes.NOT_FOUND, inline: true },
-            { name: 'Item Level', value: characterData?.average_item_level.toString() ?? ErrorCodes.NOT_FOUND },
-            ...seasonal
-          ]);
+            { name: 'Level', value: characterData?.level.toString() ?? ErrorCodes.NOT_FOUND },
+            { name: 'Item Level', value: characterData?.average_item_level.toString() ?? ErrorCodes.NOT_FOUND }
+          ])
+          .addFields([
+            ...seasonal,
+          ])
+          .addField('Faction', pvpCharacterData?.faction.name ?? ErrorCodes.NOT_FOUND);
         }
       default: 
         return null;
