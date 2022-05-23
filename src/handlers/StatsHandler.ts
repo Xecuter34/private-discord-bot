@@ -16,6 +16,13 @@ export class StatsHandler {
   private _wowClientAPI = new WarcraftAPI();
   private _prismaClient = new PrismaClient();
 
+  private buildDefaultEmbed = (): MessageEmbed => (
+    new MessageEmbed()
+      .setColor('#4DB6AC')
+      .setTitle(`User not found`)
+      .addField('Not found', ErrorCodes.NOT_FOUND)
+  );
+
   private saveToDatabase = async (stats: Record<string, number>, userHandler: user_handlers): Promise<boolean> => {
     try {
       let handlerStats = await this._prismaClient.handler_stats.findFirst({
@@ -176,6 +183,10 @@ export class StatsHandler {
         const characterData = await this._wowClientAPI.getCharacterProfile(username, realm);
         const characterMediaData = await this._wowClientAPI.getCharacterMedia(username, realm);
         const winLosePercentage = pvpCharacterData ? `${((pvpCharacterData.season_match_statistics.won / pvpCharacterData.season_match_statistics.played) * 100).toFixed(0)}%` : '0%';
+
+        if (!characterData) {
+          return this.buildDefaultEmbed();
+        }
 
         const discordUser = await this._prismaClient.discords.findFirst({
           where: {

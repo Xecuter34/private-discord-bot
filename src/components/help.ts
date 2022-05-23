@@ -37,11 +37,15 @@ export const BuildCommandHelpMessage = (command: Command) => {
       });
       commandFields.push({
         name: 'Platforms',
-        value: '`uplay`, `xbl`, `psn`'
+        value: '`uplay`, `xbl`, `psn`, `pc`'
       });
       commandFields.push({
         name: 'Supported Games',
-        value: '`siege`'
+        value: '`siege`, `warcraft`'
+      });
+      commandFields.push({
+        name: 'Additional Params',
+        value: '/params <Additional Params Here>'
       });
       break;
     default:

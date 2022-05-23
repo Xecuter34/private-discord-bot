@@ -21,6 +21,7 @@ export class WarcraftAPI {
   }
 
   getCurrentSeasonalStats = async (username: string, realm: string, bracket: string): Promise<ICharacterPvPResponse | undefined> => {
+    try {
       if (!this._warcraftClient) {
         console.log('Warcraft client is not initialized');
         return;
@@ -33,43 +34,62 @@ export class WarcraftAPI {
       })).data
 
       return pvpData;
+    } catch (error) {
+      console.error(error);
+      return;
+    }
   }
 
   getRealms = async (): Promise<IRealmResponse | undefined> => {
-    if (!this._warcraftClient) {
-      console.log('Warcraft client is not initialized');
+    try {
+      if (!this._warcraftClient) {
+        console.log('Warcraft client is not initialized');
+        return;
+      }
+  
+      const realms = (await this._warcraftClient.realm<IRealmResponse>()).data
+      return realms;
+    } catch (error) {
+      console.error(error);
       return;
     }
-
-    const realms = (await this._warcraftClient.realm<IRealmResponse>()).data
-    return realms;
   }
 
   getCharacterProfile = async (username: string, realmSlug: string): Promise<ICharacterProfileResponse | undefined> => {
-    if (!this._warcraftClient) {
-      console.log('Warcraft client is not initialized');
+    try {
+      if (!this._warcraftClient) {
+        console.log('Warcraft client is not initialized');
+        return;
+      }
+  
+      const profile = (await this._warcraftClient.characterProfile<ICharacterProfileResponse>({
+        realm: realmSlug,
+        name: username
+      })).data;
+  
+      return profile;
+    } catch (error) {
+      console.error(error);
       return;
     }
-
-    const profile = (await this._warcraftClient.characterProfile<ICharacterProfileResponse>({
-      realm: realmSlug,
-      name: username
-    })).data;
-
-    return profile;
   }
 
   getCharacterMedia = async (username: string, realmSlug: string): Promise<ICharacterMediaResponse | undefined> => {
-    if (!this._warcraftClient) {
-      console.log('Warcraft client is not initialized');
+    try {
+      if (!this._warcraftClient) {
+        console.log('Warcraft client is not initialized');
+        return;
+      }
+  
+      const media = (await this._warcraftClient.characterMedia<ICharacterMediaResponse>({
+        realm: realmSlug,
+        name: username
+      })).data;
+  
+      return media;
+    } catch (error) {
+      console.error(error);
       return;
     }
-
-    const media = (await this._warcraftClient.characterMedia<ICharacterMediaResponse>({
-      realm: realmSlug,
-      name: username
-    })).data;
-
-    return media;
   }
 }
