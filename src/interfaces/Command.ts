@@ -1,1 +1,1 @@
-export type Command = 'ping' | 'react' | 'king' | 'name' | 'stats' | 'help';
+export type Command = 'ping' | 'react' | 'king' | 'name' | 'stats' | 'server' | 'help';

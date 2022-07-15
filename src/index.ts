@@ -7,8 +7,9 @@ import { Command } from './interfaces/Command';
 import { isMatt, isValidPlatform } from './utils/Validators';
 import { PlatformAll } from './interfaces/Platforms';
 import { BuildCommandHelpMessage, BuildHelpMessage } from './components/help';
-import { StatsController } from './providers/StatController';
+//import { StatsController } from './providers/StatController';
 import { handleAdditionalParams } from './utils/Global';
+import { SteamServerHandler } from './handlers/SteamServerHandler';
 config();
 
 // Matt's Discord ID: 350753691940290581
@@ -90,6 +91,14 @@ client.on('message', async msg => {
 
         MessageHandler.sendEmbedMessage(client.channels.cache.find((c: any) => c.name === channel) as TextChannel, embedMessage);
         break;
+      case 'server':
+        const command = args.shift()?.toLowerCase();
+
+        if (command === 'info') {
+          const serverInfo = await new SteamServerHandler().getGmodTTTServer();
+          await MessageHandler.sendMessage(client.channels.cache.find((c: any) => c.name === channel) as TextChannel, `${serverInfo.Name} is running ${serverInfo.Game} on ${serverInfo.Map}`);
+          break;
+        }
       case 'help':
         const commandName = args.shift()?.toLowerCase();
         if (!commandName) {
