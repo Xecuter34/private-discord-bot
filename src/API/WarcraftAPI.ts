@@ -3,6 +3,7 @@ import { ICharacterProfileResponse } from '../interfaces/Warcraft/Responses/ICha
 import { ICharacterPvPResponse } from '../interfaces/Warcraft/Responses/ICharacterPvPResponse';
 import { IRealmResponse } from '../interfaces/Warcraft/Responses/IRealmResponse';
 import { ICharacterMediaResponse } from '../interfaces/Warcraft/Responses/ICharacterMediaResponse';
+import axios from 'axios';
 
 export class WarcraftAPI {
   private _warcraftCurrentSeason: number;
@@ -87,6 +88,27 @@ export class WarcraftAPI {
       })).data;
   
       return media;
+    } catch (error) {
+      console.error(error);
+      return;
+    }
+  }
+
+  getHrefData = async <T>(href: string) => {
+    try {
+      if (!this._warcraftClient) {
+        console.log('Warcraft client is not initialized');
+        return;
+      }
+  
+      const token = (await this._warcraftClient.getApplicationToken()).data.access_token;
+      const hrefData: T = (await axios(href, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })).data;
+
+      return hrefData;
     } catch (error) {
       console.error(error);
       return;

@@ -42,13 +42,14 @@ export class CommandHandler {
           await this.messageHandler.reply('One tells of a false king who thinks he rules over the land, this is not the true king for they art yet to reveal themselves.');
         }
         break;
-      case 'name':
-        const type = args.shift()?.toLowerCase();
-        const value = args.join(' ');
-        if (type === 'get') {
-          this.users.getUserName(msg.author.id);
-        } else if (type === 'set') {
-          this.users.setUserName(msg.author.id, value, msg.author.username);
+      case 'name': {
+          const type = args.shift()?.toLowerCase();
+          const value = args.join(' ');
+          if (type === 'get') {
+            this.users.getUserName(msg.author.id);
+          } else if (type === 'set') {
+            this.users.setUserName(msg.author.id, value, msg.author.username);
+          }
         }
         break;
       case 'stats':
@@ -87,6 +88,16 @@ export class CommandHandler {
           await this.messageHandler.sendMessage(this.client.channels.cache.find((c: any) => c.name === this.channel) as TextChannel, `${serverInfo.Name} is running ${serverInfo.Game} on ${serverInfo.Map}`);
           break;
         }
+      case 'warcraft': {
+          const character = args.shift()?.toLowerCase();
+          const realm = args.shift()?.toLowerCase();
+          const type = args.shift()?.toLowerCase();
+
+          // Find way to get specific character seasons pvp played/or dungeons done/or raid bosses killed
+          // Not sure how to structure this yet maybe 'warcraft <character> <realm> <pvp|dungeons|raids>'
+          // I can get latest of each specific request
+        }
+        break;
       case 'help':
         const commandName = args.shift()?.toLowerCase();
         if (!commandName) {

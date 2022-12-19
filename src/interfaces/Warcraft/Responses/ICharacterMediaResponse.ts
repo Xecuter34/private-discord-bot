@@ -1,12 +1,7 @@
-import { IGeneric, IHref, IKeyValue, ILink } from "../IGenerics";
+import { IGeneric, IHref, IKeyValue, ILink, ICharacter } from "../IGenerics";
 
 export interface ICharacterMediaResponse {
   _links: ILink;
-  character: {
-    key: IHref;
-    name: string;
-    id: number;
-    realm: IGeneric;
-  }
+  character: ICharacter;
   assets: IKeyValue[];
 }

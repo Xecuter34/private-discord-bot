@@ -8,6 +8,7 @@ import { WarcraftAPI } from "../API/WarcraftAPI";
 import { ErrorCodes } from "../interfaces/ErrorCodes";
 import { FACTION_COLOR } from "../interfaces/Warcraft/Misc/Colors";
 import { WarcraftData, WarcraftFallback } from "../interfaces/Warcraft/Misc/Data";
+import { ICharacterPvPSummaryResponse } from "../interfaces/Warcraft/Responses/Href/ICharacterPvPSummaryResponse";
 
 export class StatsHandler {
   private readonly REFRESH_TIME = 14400;
@@ -184,6 +185,8 @@ export class StatsHandler {
         const characterMediaData = await this._wowClientAPI.getCharacterMedia(username, realm);
         const winLosePercentage = pvpCharacterData ? `${((pvpCharacterData.season_match_statistics.won / pvpCharacterData.season_match_statistics.played) * 100).toFixed(0)}%` : '0%';
 
+        const TEMP = await this._wowClientAPI.getHrefData<ICharacterPvPSummaryResponse>(characterData?.pvp_summary.href ?? ErrorCodes.NOT_FOUND);
+
         if (!characterData) {
           return this.buildDefaultEmbed();
         }
@@ -252,7 +255,8 @@ export class StatsHandler {
           .addFields([
             { name: 'Username', value: username },
             { name: 'Level', value: characterData?.level.toString() ?? ErrorCodes.NOT_FOUND },
-            { name: 'Item Level', value: characterData?.average_item_level.toString() ?? ErrorCodes.NOT_FOUND }
+            { name: 'Item Level', value: characterData?.average_item_level.toString() ?? ErrorCodes.NOT_FOUND },
+            { name: 'PvP Item Level', value: "123" }
           ])
           .addFields([
             ...seasonal,
